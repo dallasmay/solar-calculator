@@ -45,11 +45,51 @@ const sunHours = () => {
     return hours;
 }
 
+const calculatePanel = () => {
+    let userChoiceIndex = document.forms.solarForm.panel.selectedIndex;
+    let panelOptions = document.forms.solarForm.panel.options;
+    let power = panelOptions[userChoiceIndex].value;
+    let name = panelOptions[userChoiceIndex].text;
+    let panelArr = [power, name];
+    return panelArr;
+}
+
+
+
+
 const calculateSolar = () => {
-    let dailyUseKw = addMonths("mpc");
-    console.log(dailyUseKw);
+    let dailyUseKw = Math.round(addMonths("mpc"));
+    // console.log(dailyUseKw);
 
     let sunHoursPerDay = sunHours();
-    console.log(sunHoursPerDay);
+    // console.log(sunHoursPerDay);
+
+    let minKwNeeds = dailyUseKw / sunHoursPerDay;
+    // console.log(minKwNeeds);
+
+    let realKwNeeds = minKwNeeds * 1.25;
+    // console.log(realKwNeeds);
+
+    let realWattNeeds = Math.round(realKwNeeds * 1000);
+    // console.log(realWattNeeds);
+
+    let panelInfo = calculatePanel();
+    let panelOutput = panelInfo[0];
+    let panelName = panelInfo[1];
+    // console.log(panelOutput);
+    // console.log(panelName);
+
+    let panelsNeeded = Math.ceil(realWattNeeds / panelOutput);
+    // console.log(panelsNeeded);
+
+    let feedback = "";
+    feedback += `<p>Based on your average daily use of ${dailyUseKw} kWh, you will need to purchase ${panelsNeeded} ${panelName} solar panels to offset 100% of your electricity bill.</p>`;
+    feedback += `<h2>Additional Details</h2>`;
+    feedback += `<p>Your average daily electricity consumption: ${dailyUseKw} kWh per day</p>`;
+    feedback += `<p>Average sunshine hours per day: ${sunHoursPerDay}</p>`;
+    feedback += `Realistic watts needed per hour: ${realWattNeeds} watts/hour.</p>`;
+    feedback += `<p>The ${panelName} panel you selected generates about ${panelOutput} watts per hour.</p>`;
+
+    document.getElementById("feedback").innerHTML = feedback;
 }
 
